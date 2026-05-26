@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmbuddy — Multi-Tenant Ag-Tech Marketplace SaaS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05080e;
+            --bg2: #0a0f18;
+            --bg3: #111824;
+            --card: #0e1622;
+            --card-light: #162234;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-bright: rgba(255, 255, 255, 0.15);
+
+            --emerald: #02eb99;
+            --emerald-dim: rgba(2, 235, 153, 0.12);
+            --amber: #ffaa00;
+            --amber-dim: rgba(255, 170, 0, 0.12);
+            --crimson: #ff3355;
+            --crimson-dim: rgba(255, 51, 85, 0.12);
+            --purple: #a366ff;
+            --purple-dim: rgba(163, 102, 255, 0.12);
+
+            --text: #e6eef8;
+            --text-muted: #788da8;
+            --text-dark: #495b70;
+
+            --font-d: 'Syne', sans-serif;
+            --font-b: 'DM Sans', sans-serif;
+            --font-m: 'DM Mono', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-b);
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: var(--font-b);
+            border: none;
+            background: none;
+            transition: all 0.2s;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        #header {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--emerald), #00aa77);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-d);
+            font-size: 16px;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .logo-text {
+            font-family: var(--font-d);
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--emerald);
+        }
+
+        .header-tag {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        #tab-nav {
+            flex-shrink: 0;
+            display: flex;
+            padding: 0 24px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        #tab-nav::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .tab-btn {
+            padding: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            color: var(--emerald);
+            border-bottom-color: var(--emerald);
+            font-weight: 700;
+        }
+
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: panelIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes panelIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--emerald);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .main-title {
+            font-family: var(--font-d);
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .main-title span {
+            color: var(--emerald);
+        }
+
+        .sub-title {
+            color: var(--text-muted);
+            font-size: 14px;
+            max-width: 750px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 32px 0;
+        }
+
+        /* 📱 MOBILE FIRST DEMO WORKSPACE */
+        .demo-workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .phone-frame {
+            width: 320px;
+            height: 640px;
+            background: #000;
+            border-radius: 40px;
+            border: 4px solid var(--border-bright);
+            padding: 10px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .phone-screen {
+            height: 100%;
+            width: 100%;
+            background: var(--bg);
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .phone-statusbar {
+            padding: 6px 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            background: var(--bg2);
+        }
+
+        .phone-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+        }
+
+        .phone-app-title {
+            font-family: var(--font-d);
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .phone-app-title span {
+            color: var(--emerald);
+        }
+
+        .phone-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .phone-body::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* PLATFORM UI COMPONENTS */
+        .role-badge-container {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .role-indicator {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-family: var(--font-m);
+        }
+
+        .ri-admin {
+            background: var(--purple-dim);
+            color: var(--purple);
+        }
+
+        .ri-field {
+            background: var(--amber-dim);
+            color: var(--amber);
+        }
+
+        .ri-store {
+            background: var(--emerald-dim);
+            color: var(--emerald);
+        }
+
+        .selector-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .selector-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .pill-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pill-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .ui-pill {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .ui-pill.active {
+            border-color: var(--emerald);
+            color: var(--emerald);
+            background: rgba(2, 235, 153, 0.03);
+            font-weight: 700;
+        }
+
+        .action-trigger {
+            width: 100%;
+            background: var(--emerald);
+            color: #000;
+            font-family: var(--font-d);
+            font-weight: 800;
+            font-size: 12px;
+            padding: 14px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .action-trigger:active {
+            transform: scale(0.98);
+        }
+
+        .terminal-box {
+            display: none;
+            background: #04070c;
+            border: 1px solid rgba(2, 235, 153, 0.15);
+            border-radius: 12px;
+            padding: 14px;
+            font-family: var(--font-m);
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            color: #bbfdeb;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .terminal-box.visible {
+            display: block;
+        }
+
+        /* BUSINESS LOGIC VISUALIZATIONS */
+        .logic-card {
+            background: var(--bg2);
+            border-left: 4px solid var(--emerald);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
+        }
+
+        .logic-card.amber {
+            border-left-color: var(--amber);
+        }
+
+        .logic-card.crimson {
+            border-left-color: var(--crimson);
+        }
+
+        .logic-card-title {
+            font-family: var(--font-d);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .logic-card-desc {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* REUSABLE CORE COMPONENT MATRIX */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 12px;
+        }
+
+        .matrix-table th {
+            padding: 12px;
+            background: var(--bg2);
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .matrix-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        .tech-tag {
+            background: var(--bg3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-m);
+            font-size: 10px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-m);
+            text-transform: uppercase;
+        }
+
+        .b-emerald {
+            background: var(--emerald-dim);
+            color: var(--emerald);
+        }
+
+        .b-amber {
+            background: var(--amber-dim);
+            color: var(--amber);
+        }
+
+        .b-crimson {
+            background: var(--crimson-dim);
+            color: var(--crimson);
+        }
+
+        .b-purple {
+            background: var(--purple-dim);
+            color: var(--purple);
+        }
+
+        ul.clean-list {
+            list-style: none;
+        }
+
+        ul.clean-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        ul.clean-list li::before {
+            content: "▪";
+            position: absolute;
+            left: 0;
+            color: var(--emerald);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <header id="header">
+            <div class="logo-area">
+                <div class="logo-box">F</div>
+                <div class="logo-text">Farm<span>buddy</span></div>
+            </div>
+            <div class="header-tag">Enterprise SaaS Core & Reusable UI/UX Presentation</div>
+            <div class="badge-live">PHASE 1 SPEC</div>
+        </header>
+
+        <nav id="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('hierarchy')" id="btn-hierarchy">👥 Corporate User
+                Hierarchy</button>
+            <button class="tab-btn" onclick="switchTab('perishable')" id="btn-perishable">🍎 Perishable Lifecycle
+                Loop</button>
+            <button class="tab-btn" onclick="switchTab('reusable')" id="btn-reusable">🧱 Reusable Architecture</button>
+            <button class="tab-btn" onclick="switchTab('interactive')" id="btn-interactive">🎬 Live Interface
+                Demo</button>
+            <button class="tab-btn" onclick="switchTab('techstack')" id="btn-techstack">⚙️ Recommended Stack</button>
+        </nav>
+
+        <main id="content">
+
+            <div class="tab-panel active" id="panel-hierarchy">
+                <div class="eyebrow">Data Boundary Isolation</div>
+                <div class="main-title">Multi-User Corporate <span>Access Control</span></div>
+                <div class="sub-title">Farmbuddy establishes clean access boundaries across your enterprise. Users see
+                    exactly what their business scale requires, ensuring clean financial data boundaries[cite: 689].
+                </div>
+
+                <div class="grid-3">
+                    <div class="card" style="border-top: 3px solid var(--purple);">
+                        <div class="badge b-purple" style="margin-bottom:8px;">C-Suite Administrator</div>
+                        <div style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Global Cockpit View
+                        </div>
+                        <p style="color:var(--text-muted); font-size:12px; line-height:1.6;">Full cross-location
+                            analytics control[cite: 632, 689]. Monitors multi-tenant operational cash flows, high-level
+                            yield values, and sets target profit thresholds without handling day-to-day entries.</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--amber);">
+                        <div class="badge b-amber" style="margin-bottom:8px;">Field Manager</div>
+                        <div style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Multi-Location
+                            Operations</div>
+                        <p style="color:var(--text-muted); font-size:12px; line-height:1.6;">Authorized cross-location
+                            manager[cite: 689]. Responsible for executing mass data uploads (purchase and sales
+                            manifests)[cite: 636, 689], managing total vendor client systems, and evaluating regional
+                            transport margins.</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--emerald);">
+                        <div class="badge b-emerald" style="margin-bottom:8px;">Store Manager</div>
+                        <div style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Hub-Isolated
+                            Execution</div>
+                        <p style="color:var(--text-muted); font-size:12px; line-height:1.6;">Strictly limited to a
+                            single physical hub[cite: 689]. Blinded to macro corporate overhead[cite: 704]. Manages
+                            local inventory shelf-life entries, executes data check-ins, and handles physical quality
+                            overrides[cite: 705].</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-perishable">
+                <div class="eyebrow">Perishable Physics</div>
+                <div class="main-title">Shelf-Life, Waste, & <span>Dynamic Markdowns</span></div>
+                <div class="sub-title">Traditional marketplaces treat farm yields like stable box inventory[cite: 590,
+                    684]. Farmbuddy links pricing directly to the perishable degradation clock of agricultural
+                    products[cite: 583].</div>
+
+                <div class="grid-3">
+                    <div class="logic-card">
+                        <div class="logic-card-title">Perishable Shelf-Life Matrix</div>
+                        <div class="logic-card-desc">Every batch entry is mapped with an expiration timestamp based on
+                            commodity category and cold-chain storage status[cite: 606, 607]. The system continuously
+                            monitors remaining product viability.</div>
+                    </div>
+                    <div class="logic-card amber">
+                        <div class="logic-card-title">Rot-Prevention Markdowns</div>
+                        <div class="logic-card-desc">The system triggers promotional discount tiers linked to the
+                            product's remaining useful life (e.g., a 15% automatic markdown at 50% shelf-life) to
+                            liquidate assets before spoilage occurs[cite: 609, 611].</div>
+                    </div>
+                    <div class="logic-card crimson">
+                        <div class="logic-card-title">Waste Product Redirection</div>
+                        <div class="logic-card-desc">When an inventory batch drops below a 15% fresh consumption
+                            threshold, it is automatically flagged as waste and routed to industrial processing or
+                            secondary compost buyers to insulate capital[cite: 615, 616].</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-reusable">
+                <div class="eyebrow">Engineering Strategy</div>
+                <div class="main-title">Reusable Component Design <span>(SaaS Foundation)</span></div>
+                <div class="sub-title">To build a platform that cleanly scales from your private tool into a public
+                    multi-tenant B2B SaaS startup, all frontend layouts and API controllers are decoupled into modular
+                    layers on Day 1[cite: 641, 690, 692, 693].</div>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Component Layer</th>
+                            <th style="width: 45%;">Functional Reusability & Context</th>
+                            <th style="width: 30%;">Decoupled UI Module Specification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Data Ingestion Hub</strong></td>
+                            <td>Unified upload wrapper that reads mass data streams. The same backend controller scales
+                                from internal use to handling public customer business operations[cite: 636, 692].</td>
+                            <td><span class="tech-tag">Asynchronous File Splitter</span> <span class="tech-tag">CSV /
+                                    JSON Parser</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Consolidated Dashboard View</strong></td>
+                            <td>A component layout that maps data based on permissions[cite: 700]. Swaps seamlessly
+                                between single-location field entries and multi-tenant management view grids[cite: 632].
+                            </td>
+                            <td><span class="tech-tag">Location Matrix Filter</span> <span class="tech-tag">Aggregated
+                                    Margin Metric</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quality Arbitrator Widget</strong></td>
+                            <td>The interface component for human-in-the-loop inspection sign-offs[cite: 687, 694].
+                                Standardizes grading criteria and logs data adjustments to secure financial profiles
+                                against transit losses[cite: 651, 699].</td>
+                            <td><span class="tech-tag">Inspection Form Layout</span> <span class="tech-tag">Override
+                                    Ledger Recorder</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-panel" id="panel-interactive">
+                <div class="eyebrow">Mobile-First Interface Blueprint</div>
+                <div class="main-title">Interactive App <span>Workflow Simulator</span></div>
+                <div class="sub-title">Simulate the interface workflows across multi-user roles, product freshness
+                    drops, and mass data pipeline executions[cite: 632, 636, 689].</div>
+
+                <div class="demo-workspace">
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <div class="phone-statusbar">
+                                <span>22:12</span>
+                                <span>Farmbuddy Client Core v1.0</span>
+                            </div>
+                            <div class="phone-header">
+                                <div class="phone-app-title">Farm<span>buddy</span> Engine</div>
+                                <div class="role-badge-container" id="currentRoleContainer">
+                                    <span class="role-indicator ri-admin" id="roleBadge">CSUITE_ADMIN</span>
+                                </div>
+                            </div>
+
+                            <div class="phone-body">
+                                <div class="selector-box">
+                                    <div class="selector-title">1. Toggle Auth Role Identity</div>
+                                    <div class="pill-stack">
+                                        <div class="pill-row">
+                                            <button class="ui-pill active" id="r-csuite"
+                                                onclick="setRole('CSUITE_ADMIN')">👑 C-Suite</button>
+                                            <button class="ui-pill" id="r-field" onclick="setRole('FIELD_MANAGER')">🌾
+                                                Field Mgr</button>
+                                        </div>
+                                        <button class="ui-pill" id="r-store" onclick="setRole('STORE_MANAGER')">🏪 Store
+                                            Mgr (Hub Panvel)</button>
+                                    </div>
+                                </div>
+
+                                <div class="selector-box">
+                                    <div class="selector-title">2. Choose Location Context</div>
+                                    <div class="pill-stack">
+                                        <div class="pill-row">
+                                            <button class="ui-pill active" id="loc-all" onclick="setLocation('ALL')">🌐
+                                                Consolidated</button>
+                                            <button class="ui-pill" id="loc-pnv" onclick="setLocation('PANVEL')">📍
+                                                Panvel Hub</button>
+                                        </div>
+                                        <button class="ui-pill" id="loc-nsk" onclick="setLocation('NASHIK')">📍 Nashik
+                                            Facility</button>
+                                    </div>
+                                </div>
+
+                                <div class="selector-box">
+                                    <div class="selector-title">3. Execute Operational Pipeline</div>
+                                    <div class="pill-stack">
+                                        <button class="ui-pill active" id="job-mass" onclick="setJob('MASS_DATA')">📥
+                                            Upload Mass Purchase Spreadsheets</button>
+                                        <button class="ui-pill" id="job-quality"
+                                            onclick="setJob('QUALITY_DOWNGRADE')">⚠️ Quality Overrides
+                                            (Human-In-The-Loop)</button>
+                                        <button class="ui-pill" id="job-shelf" onclick="setJob('SHELF_LIFE_ALERT')">⏰
+                                            Spoilage Markdown Trigger</button>
+                                    </div>
+                                </div>
+
+                                <button class="action-trigger" onclick="runAppWorkflowSimulator()">⚡ Run Action
+                                    Influx</button>
+
+                                <div class="terminal-box" id="simOutput">System context initialized...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div
+                            style="font-family:var(--font-d); font-size:18px; margin-bottom:12px; color:var(--emerald);">
+                            What this simulation demonstrates to Management:</div>
+                        <div style="display:flex; flex-direction:column; gap:16px;">
+                            <div>
+                                <strong
+                                    style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Decoupled
+                                    UI/UX Flow Architecture</strong>
+                                <p style="color:var(--text-muted); font-size:12px; line-height:1.5;">Notice how changing
+                                    your authentication identity dynamically updates location parameters and operational
+                                    access. Store Managers are locked strictly to their assigned facilities[cite: 689,
+                                    705], protecting proprietary corporate networks.</p>
+                            </div>
+                            <div>
+                                <strong
+                                    style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">Human-in-the-Loop
+                                    Quality Arbitrator</strong>
+                                <p style="color:var(--text-muted); font-size:12px; line-height:1.5;">When selected, this
+                                    feature models the physical arrival checkpoint[cite: 697]. The app prevents
+                                    autonomous downgrade calculations from updating financial ledgers without explicit
+                                    inspection entry from authorized regional staff[cite: 687, 694].</p>
+                            </div>
+                            <div>
+                                <strong
+                                    style="color:var(--text); font-size:13px; display:block; margin-bottom:2px;">High-Throughput
+                                    Mass Data Pipelines</strong>
+                                <p style="color:var(--text-muted); font-size:12px; line-height:1.5;">Simulates loading
+                                    mass data entries[cite: 636]. The backend engine parses bulk transactions
+                                    concurrently, updating local inventory ledgers without causing table-locking delays
+                                    on mobile interfaces[cite: 660].</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-techstack">
+                <div class="eyebrow">SaaS Stack Spec</div>
+                <div class="main-title">Micro-SaaS Production <span>Technology Infrastructure</span></div>
+                <div class="sub-title">Decoupled, serverless architecture built for rapid Phase 1 deployment with
+                    complete code reusability[cite: 633, 669, 690].</div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div
+                            style="font-family:var(--font-d); font-weight:700; color:var(--emerald); margin-bottom:8px;">
+                            Frontend: Next.js 15 (React) + PWA Wrapper [cite: 670, 671]</div>
+                        <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-bottom:8px;">
+                            Next.js Server Components optimize mobile network usage. Packaging the frontend as a
+                            Progressive Web App (PWA) enables offline data entry for transit operators in low-signal
+                            rural hubs, syncing transactions cleanly once a connection is restored[cite: 670, 671].
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div
+                            style="font-family:var(--font-d); font-weight:700; color:var(--emerald); margin-bottom:8px;">
+                            Database: PostgreSQL via Managed Google Cloud SQL [cite: 512, 672]</div>
+                        <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-bottom:8px;">
+                            Agricultural business ledgers demand relational transaction handling. PostgreSQL manages
+                            multi-tenant privacy fields cleanly using database-level Row-Level Security (RLS) tracking,
+                            ensuring tenant data remains completely isolated as you scale into a SaaS framework[cite:
+                            653, 673].
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function switchTab(id) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + id).classList.add('active');
+            document.getElementById('btn-' + id).classList.add('active');
+        }
+
+        let activeRole = 'CSUITE_ADMIN';
+        let activeLocation = 'ALL';
+        let activeJob = 'MASS_DATA';
+
+        function setRole(id) {
+            ['csuite', 'field', 'store'].forEach(r => document.getElementById('r-' + r).classList.remove('active'));
+            const elMap = { 'CSUITE_ADMIN': 'csuite', 'FIELD_MANAGER': 'field', 'STORE_MANAGER': 'store' };
+            document.getElementById('r-' + elMap[id]).classList.add('active');
+
+            const b = document.getElementById('roleBadge');
+            b.className = 'role-indicator';
+            if (id === 'CSUITE_ADMIN') { b.classList.add('ri-admin'); b.textContent = 'CSUITE_ADMIN'; }
+            if (id === 'FIELD_MANAGER') { b.classList.add('ri-field'); b.textContent = 'FIELD_MANAGER'; }
+            if (id === 'STORE_MANAGER') { b.classList.add('ri-store'); b.textContent = 'STORE_MANAGER'; }
+
+            activeRole = id;
+        }
+
+        function setLocation(id) {
+            ['all', 'pnv', 'nsk'].forEach(l => document.getElementById('loc-' + l).classList.remove('active'));
+            const elMap = { 'ALL': 'all', 'PANVEL': 'pnv', 'NASHIK': 'nsk' };
+            document.getElementById('loc-' + elMap[id]).classList.add('active');
+            activeLocation = id;
+        }
+
+        function setJob(id) {
+            ['mass', 'quality', 'shelf'].forEach(j => document.getElementById('job-' + j).classList.remove('active'));
+            const elMap = { 'MASS_DATA': 'mass', 'QUALITY_DOWNGRADE': 'quality', 'SHELF_LIFE_ALERT': 'shelf' };
+            document.getElementById('job-' + elMap[id]).add ? document.getElementById('job-' + elMap[id]).add('active') : document.getElementById('job-' + elMap[id]).classList.add('active');
+            activeJob = id;
+        }
+
+        function runAppWorkflowSimulator() {
+            const box = document.getElementById('simOutput');
+            box.classList.remove('visible');
+            box.textContent = "INITIALIZING CORE DATA INFLUX TRANSACTION...";
+            box.classList.add('visible');
+
+            setTimeout(() => {
+                // SECURITY VALIDATION CHECK FIRST
+                if (activeRole === 'STORE_MANAGER' && activeLocation === 'ALL') {
+                    box.textContent = "❌ SECURITY ACCESS VIOLATION:\nUser tier [STORE_MANAGER] is strictly blocked from executing cross-location consolidated commands. Access Denied.";
+                    return;
+                }
+                if (activeRole === 'STORE_MANAGER' && activeLocation === 'NASHIK') {
+                    box.textContent = "❌ SECURITY HUB BOUNDARY SCOPE BREACH:\nUser context locked to Panvel Hub. Request to access Nashik Facility balances blocked at Row-Level Security layer.";
+                    return;
+                }
+                if (activeRole === 'STORE_MANAGER' && activeJob === 'MASS_DATA') {
+                    box.textContent = "❌ COMPLIANCE PERMISSION FAULT:\nStore-level managers do not possess global ledger credentials to clear bulk corporate spreadsheets. Route rejected.";
+                    return;
+                }
+
+                // PROCESS VALID CHANNELS
+                if (activeJob === 'MASS_DATA') {
+                    box.textContent = `🚀 HIGH-THROUGHPUT BULK PIPELINE SUCCESS:\nAuthorized by Tier: ${activeRole}\nTarget Node Access: ${activeLocation}\nParsed 4,200 unique incoming batch items successfully across targets.\nGross transactional accounting margins re-computed seamlessly.`;
+                } else if (activeJob === 'QUALITY_DOWNGRADE') {
+                    box.textContent = `⚠️ HUMAN-IN-THE-LOOP OVERRIDE LEDGER RECORDED:\nAudited and signed off by: ${activeRole} at Node: ${activeLocation}\nProduce Batch #B-9912 degraded from Grade-A to Grade-B.\nRelational adjustment executed: Farmer payout adjusted and dynamic regional markdown updated in platform tracking matrix.`;
+                } else if (activeJob === 'SHELF_LIFE_ALERT') {
+                    box.textContent = `⏰ REUSABLE SHELF-LIFE AUTOMATION OVERVIEW:\nScanning databases for Location Filter: ${activeLocation}\nBatch Tomato-T91 remaining useful life calculated below 40%.\nTriggered Markdown Action: Applied 20% markdown across active consumer channels to minimize asset waste.`;
+                }
+            }, 1000);
+        }
+    </script>
+
+</body>
+
+</html>

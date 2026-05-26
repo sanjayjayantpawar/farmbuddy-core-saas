@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmbuddy — Enterprise POS & Marketplace SaaS Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   PREMIUM ENTERPRISE DESIGN TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --bg:          #05080e;
+  --bg-sidebar:  #0a0f1a;
+  --bg-workspace:#0c1424;
+  --card:        #111c2e;
+  --card-inner:  #16253c;
+  --border:      rgba(255,255,255,0.06);
+  --border-glow: rgba(255,255,255,0.14);
+
+  --emerald:     #00ebd0;
+  --emerald-dim: rgba(0,235,208,0.12);
+  --amber:       #ffa600;
+  --amber-dim:   rgba(255,166,0,0.12);
+  --purple:      #a270ff;
+  --purple-dim:  rgba(162,112,255,0.12);
+  --crimson:     #ff4060;
+  --crimson-dim: rgba(255,64,96,0.10);
+
+  --text:        #e9f0f8;
+  --text-muted:  #899db6;
+  --text-dark:   #4a5c73;
+
+  --font-d:      'Syne', sans-serif;
+  --font-b:      'DM Sans', sans-serif;
+  --font-m:      'DM Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════
+   RESET & ANTI-STRETCH GRID WRAPPERS
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 13px; line-height: 1.6; overflow: hidden; -webkit-font-smoothing: antialiased; }
+button { cursor: pointer; font-family: var(--font-b); border: none; background: none; transition: all 0.2s; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 4px; }
+
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.25;
+}
+
+#app-root { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; overflow: hidden; }
+
+/* TOP APP BRANDING HEADER */
+header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 58px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.brand-box { display: flex; align-items: center; gap: 10px; }
+.brand-icon { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--emerald), #009ca3); display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 15px; font-weight: 800; color: #000; }
+.brand-title { font-family: var(--font-d); font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
+.brand-title span { color: var(--emerald); }
+.brand-tagline { font-size: 10px; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* MASTER HOUSING */
+.main-wrapper { flex: 1; display: flex; overflow: hidden; }
+
+/* SIDEBAR NAVIGATION */
+.sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; overflow-y: auto; }
+.nav-btn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; color: var(--text-muted); font-size: 12px; font-weight: 500; text-align: left; transition: all 0.15s ease; }
+.nav-btn:hover { background: rgba(255,255,255,0.02); color: var(--text); }
+.nav-btn.active { background: var(--card); color: var(--emerald); font-weight: 700; border: 1px solid var(--border); }
+
+/* WORKSPACE CONTAINER */
+.workspace { flex: 1; background: var(--bg-workspace); padding: 36px 40px; overflow-y: auto; }
+.content-limiter { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+
+.page-view { display: none; }
+.page-view.active-view { display: block; animation: viewIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes viewIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* DESIGN TYPOGRAPHY */
+.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--emerald); margin-bottom: 8px; }
+.view-title { font-family: var(--font-d); font-size: 26px; font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 8px; }
+.view-title span { color: var(--emerald); }
+.view-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 750px; margin-bottom: 32px; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; position: relative; }
+.divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+.badge { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; font-family: var(--font-m); }
+.b-emerald { background: var(--emerald-dim); color: var(--emerald); }
+.b-amber { background: var(--amber-dim); color: var(--amber); }
+.b-purple { background: var(--purple-dim); color: var(--purple); }
+.b-crimson { background: var(--crimson-dim); color: var(--crimson); }
+
+/* PITCH CONTEXT ROWS */
+.pitch-row { border-left: 3px solid var(--border-glow); padding: 4px 0 4px 16px; margin-bottom: 20px; }
+.pitch-row.active-row { border-left-color: var(--emerald); background: rgba(0,235,208,0.01); border-radius: 0 8px 8px 0; }
+.pitch-header { font-family: var(--font-d); font-size: 14px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+.pitch-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* DEVELOPMENT PLAN SPECIFICATION TABLES */
+.plan-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 8px; }
+.plan-table th { padding: 12px 10px; background: var(--bg-sidebar); color: var(--text-dark); font-size: 11px; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border); }
+.plan-table td { padding: 14px 10px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; line-height: 1.5; }
+.token { background: var(--bg-workspace); padding: 2px 6px; border-radius: 4px; font-family: var(--font-m); font-size: 11px; color: var(--text-muted); border: 1px solid var(--border); }
+
+/* INTERACTIVE APPLICATION WIREFRAME ELEMENTS */
+.simulator-layout { display: grid; grid-template-columns: 310px 1fr; gap: 32px; align-items: start; }
+.phone-shell { width: 310px; height: 600px; background: #000; border-radius: 40px; border: 4px solid var(--border-glow); padding: 8px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); position: relative; }
+.phone-screen { height: 100%; width: 100%; background: linear-gradient(160deg, #0a1120, #04070d); border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.02); }
+.phone-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.phone-body::-webkit-scrollbar { width: 0; }
+
+.ui-panel-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px; border-radius: 12px; }
+.ui-panel-lbl { font-size: 9px; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.ui-pill-stack { display: flex; flex-direction: column; gap: 6px; }
+.ui-pill-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ui-action-btn { background: var(--bg-workspace); border: 1px solid var(--border); padding: 9px; border-radius: 6px; font-size: 11px; text-align: left; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.ui-action-btn:hover { border-color: rgba(0,235,208,0.2); color: var(--text); }
+.ui-action-btn.active { border-color: var(--emerald); color: var(--emerald); background: rgba(0,235,208,0.04); font-weight: 700; }
+
+.ui-trigger { width: 100%; background: var(--emerald); color: #000; font-family: var(--font-d); font-weight: 800; font-size: 12px; padding: 12px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.ui-trigger:active { transform: scale(0.98); }
+
+.terminal-box { display: none; background: #03050a; border: 1px solid rgba(0,235,208,0.15); border-radius: 8px; padding: 12px; font-family: var(--font-m); font-size: 11px; line-height: 1.4; color: #9bf3e1; white-space: pre-wrap; overflow-y: auto; flex: 1; max-height: 170px; }
+.terminal-box.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div id="app-root">
+
+  <header>
+    <div class="brand-box">
+      <div class="brand-icon">F</div>
+      <div class="brand-title">Farm<span>buddy</span></div>
+    </div>
+    <div class="brand-tagline">Micro-SaaS POS & Marketplace Enterprise Platform Specification</div>
+    <div class="badge b-emerald">Phase 1 Architecture</div>
+  </header>
+
+  <div class="main-wrapper">
+    
+    <aside class="sidebar">
+      <button class="nav-btn active" id="menu-overview" onclick="showView('overview')">🌐 Strategic Overview</button>
+      <button class="nav-btn" id="menu-features" onclick="showView('features')">🎯 Core Video Features</button>
+      <button class="nav-btn" id="menu-plan" onclick="showView('plan')">📋 Development Roadmap</button>
+      <button class="nav-btn" id="menu-simulator" onclick="showView('simulator')">🎬 Interactive App Demo</button>
+    </aside>
+
+    <main class="workspace">
+      <div class="content-limiter">
+
+        <div class="page-view active-view" id="view-overview">
+          <div class="eyebrow">Enterprise Valuation Pitch</div>
+          <div class="view-title">Agricultural Marketplace <span>SaaS Framework</span></div>
+          <div class="view-desc">Farmbuddy translates the raw, distributed physics of agricultural supply layers into a secure, multi-tenant corporate software environment, ensuring clean data boundaries from field gates to administrative terminals.</div>
+          
+          <div class="grid-3">
+            <div class="card" style="border-top: 3px solid var(--purple);">
+              <div class="badge b-purple" style="margin-bottom:8px;">Multi-Tenant SaaS Core</div>
+              <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-top:4px;">Built from Day 1 as a multi-client framework. Complete software data boundary containment allows parent companies to scale independent vendor networks safely without information leaks.</p>
+            </div>
+            <div class="card" style="border-top: 3px solid var(--amber);">
+              <div class="badge b-amber" style="margin-bottom:8px;">Multi-Location Cockpit</div>
+              <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-top:4px;">Decoupled information visibility loops. Regional hub networks see only localized operational rows, while executive leadership tracks consolidated turnover and margins.</p>
+            </div>
+            <div class="card" style="border-top: 3px solid var(--emerald);">
+              <div class="badge b-emerald" style="margin-bottom:8px;">Human-In-The-Loop</div>
+              <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-top:4px;">Strict validation protocol gates automated backend actions, requiring physical on-site loading dock sign-offs before ledger rows or product grade revaluations update.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-view" id="view-features">
+          <div class="eyebrow">Video Core Component Overhaul</div>
+          <div class="view-title">Refining the <span>YouTube POS Mechanics</span></div>
+          <div class="view-desc">The reference video detailed a small-business single-user POS system running on flat files. Farmbuddy re-allocates those exact core functions into a multi-client ag-tech enterprise platform.</div>
+          
+          <div class="pitch-row active-row">
+            <div class="pitch-header">
+              <div>1. Order Settlement & Checkout Interface</div>
+              <span class="badge b-emerald">POS Feature Ingestion</span>
+            </div>
+            <div class="pitch-text">The video maps product selections straight to uniform stock counters. Farmbuddy refines this order logic into a checkout interface designed for mobile tablets that processes individual client lots, updates weights, structures payment options (Cash, Bank, Ledger splits), and handles active customer dues simultaneously.</div>
+          </div>
+
+          <div class="pitch-row active-row">
+            <div class="pitch-header">
+              <div>2. Multi-Role Permissions Matrix</div>
+              <span class="badge b-emerald">POS Feature Ingestion</span>
+            </div>
+            <div class="pitch-text">The video sets up access visibility roles (Admin, Manager, Cashier, Warehouse) across a single store domain. Farmbuddy embeds these credentials directly within multi-tenant organization tokens. Store Managers are locked to local storage nodes, while Field Managers handle cross-location ingestion queues.</div>
+          </div>
+
+          <div class="pitch-row active-row">
+            <div class="pitch-header">
+              <div>3. Mass Data Upload Pipelines</div>
+              <span class="badge b-emerald">POS Feature Ingestion</span>
+            </div>
+            <div class="pitch-text">The video handles text files through standard system scripts. Farmbuddy deploys high-throughput data processing pipelines. Field personnel can drop complex multi-row purchase records or distributor sales logs directly onto browser grids without stalling user interface lines.</div>
+          </div>
+        </div>
+
+        <div class="page-view" id="view-plan">
+          <div class="eyebrow">Phase 1 Infrastructure Scope</div>
+          <div class="view-title">Step-by-Step <span>Development & Execution Roadmap</span></div>
+          <div class="view-desc">The structural plan required to deliver the core marketplace functionality using reusable backend components and clean mobile-first view layout wrappers.</div>
+
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">Execution Step</th>
+                <th style="width: 30%;">Target Feature Objective</th>
+                <th style="width: 50%;">Technical Implementation Deliverable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Step 1</strong></td>
+                <td>Multi-User Permission & SaaS Roles</td>
+                <td>Deploy corporate client registration pages and set up authentication tokens that isolate views dynamically between <span class="token">C-Suite Admin</span>, <span class="token">Field Manager</span>, and localized <span class="token">Store Manager</span> profiles.</td>
+              </tr>
+              <tr>
+                <td><strong>Step 2</strong></td>
+                <td>Mobile-First POS Order Checkout</td>
+                <td>Construct a lightweight checkout screen optimized for handheld tablets. Processes individual farmer batch records, logs current product weight scales, and handles transaction payments (Full, Partial, Overdue).</td>
+              </tr>
+              <tr>
+                <td><strong>Step 3</strong></td>
+                <td>Mass Spreadsheet Upload Ingestion</td>
+                <td>Build decoupled background upload tasks that process multi-row spreadsheets (Mass Purchase and Mass Sales manifests) concurrently, ensuring mobile screens remain interactive during file ingestion runs.</td>
+              </tr>
+              <tr>
+                <td><strong>Step 4</strong></td>
+                <td>Shelf Life, Markdown, & Waste Matrix</td>
+                <td>Implement relational product tracking parameters. Attaches dynamic freshness degradation counters to arrival lots, computes rot-prevention markdowns automatically, and redirects expired stock to industrial byproduct buyers.</td>
+              </tr>
+              <tr>
+                <td><strong>Step 5</strong></td>
+                <td>Human-In-The-Loop Arbitrator</td>
+                <td>Establish visual inspection checkpoints across loading docks. Stops autonomous system revaluations and mandates authorized operator sign-offs before ledger modifications take effect.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="page-view" id="view-simulator">
+          <div class="eyebrow">Mobile Interface Preview</div>
+          <div class="view-title">Functional Application <span>Workflow Simulator</span></div>
+          <div class="section-desc">Interact with the access role permissions, target warehouse locations, and data pipeline tasks to witness the backend logical validation core.</div>
+
+          <div class="simulator-layout">
+            <div class="phone-shell">
+              <div class="phone-screen">
+                <div class="phone-body">
+                  
+                  <div class="ui-panel-box">
+                    <div class="ui-panel-lbl">1. Toggle Authentication Role</div>
+                    <div class="ui-pill-stack">
+                      <div class="ui-pill-row">
+                        <button class="ui-action-btn active" id="p-csuite" onclick="setSimRole('CSUITE_ADMIN')">👑 Owner Admin</button>
+                        <button class="ui-action-btn" id="p-field" onclick="setSimRole('FIELD_MANAGER')">🌾 Field Mgr</button>
+                      </div>
+                      <button class="ui-action-btn" id="p-store" onclick="setSimRole('STORE_MANAGER')" style="width:100%;">🏪 Store Mgr (Panvel Hub)</button>
+                    </div>
+                  </div>
+
+                  <div class="ui-panel-box">
+                    <div class="ui-panel-lbl">2. Select Location Context Scope</div>
+                    <div class="ui-pill-stack">
+                      <div class="ui-pill-row">
+                        <button class="ui-action-btn active" id="l-all" onclick="setSimLoc('ALL')">🌐 Consolidated</button>
+                        <button class="ui-action-btn" id="l-pnv" onclick="setSimLoc('PANVEL')">📍 Panvel Hub</button>
+                      </div>
+                      <button class="ui-action-btn" id="l-nsk" onclick="setSimLoc('NASHIK')" style="width:100%;">📍 Nashik Facility</button>
+                    </div>
+                  </div>
+
+                  <div class="ui-panel-box">
+                    <div class="ui-panel-lbl">3. Choose Influx Pipeline</div>
+                    <div class="ui-pill-stack">
+                      <button class="ui-action-btn active" id="j-mass" onclick="setSimJob('MASS_DATA')">📥 Upload Bulk Purchase Sheet</button>
+                      <button class="ui-action-btn" id="j-hitl" onclick="setSimJob('HITL_OVERRIDE')">⚠️ Transit Quality Override (Human In Loop)</button>
+                      <button class="ui-action-btn" id="j-decay" onclick="setSimJob('DECAY_RUN')">⏰ Refresh Expiration Markdowns</button>
+                    </div>
+                  </div>
+
+                  <button class="ui-trigger" onclick="triggerSimEngineCycle()">⚡ Fire Action Vector</button>
+                  
+                  <div class="terminal-box" id="simTerminalWindow">Awaiting interface trigger inputs...</div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div style="font-family:var(--font-d); font-size:16px; font-weight:800; color:var(--emerald); margin-bottom:12px;">Operational Compliance Governance:</div>
+              <p style="color:var(--text-muted); font-size:12px; line-height:1.6; margin-bottom:14px;">
+                This simulator demonstrates the data isolation filters built directly within layout views. Try selecting <strong>Store Mgr</strong> while running a **Consolidated** target scope or a **Bulk Spreadsheet Ingestion**. The app immediately flags permission errors, modeling how row security protects your corporate network.
+              </p>
+              
+              <div style="font-family:var(--font-d); font-size:14px; margin-bottom:6px; color:var(--amber);">Phase 2 AI Assistant ("Agra") Integration Strategy:</div>
+              <p style="color:var(--text-muted); font-size:12px; line-height:1.6;">
+                Phase 1 structures all core tables, personnel permissions, and warehouse location tags cleanly. In Phase 2, your 24/7 background AI engine joins the ecosystem seamlessly—monitoring these exact logs to automate live mandi price adjustments via Google Search Grounding and manage marketing metrics.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+function showView(viewId) {
+  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  const targetView = document.getElementById('view-' + viewId);
+  if (targetView) targetView.classList.add('active-view');
+  
+  const targetMenu = document.getElementById('menu-' + viewId);
+  if (targetMenu) targetMenu.classList.add('active');
+}
+
+let activeSimRole = 'CSUITE_ADMIN';
+let activeSimLocation = 'ALL';
+let activeSimJob = 'MASS_DATA';
+
+function setSimRole(id) {
+  ['csuite','field','store'].forEach(r => document.getElementById('p-' + r).classList.remove('active'));
+  const elMap = { 'CSUITE_ADMIN':'csuite', 'FIELD_MANAGER':'field', 'STORE_MANAGER':'store' };
+  document.getElementById('p-' + elMap[id]).classList.add('active');
+  activeSimRole = id;
+}
+
+function setSimLoc(id) {
+  ['all','pnv','nsk'].forEach(l => document.getElementById('l-' + l).classList.remove('active'));
+  const elMap = { 'ALL':'all', 'PANVEL':'pnv', 'NASHIK':'nsk' };
+  document.getElementById('l-' + elMap[id]).classList.add('active');
+  activeSimLocation = id;
+}
+
+function setSimJob(id) {
+  ['mass','hitl','decay'].forEach(j => document.getElementById('j-' + j).classList.remove('active'));
+  const elMap = { 'MASS_DATA':'mass', 'HITL_OVERRIDE':'hitl', 'DECAY_RUN':'decay' };
+  document.getElementById('j-' + elMap[id]).classList.add('active');
+  activeSimJob = id;
+}
+
+function triggerSimEngineCycle() {
+  const terminal = document.getElementById('simTerminalWindow');
+  terminal.classList.remove('visible');
+  terminal.textContent = "VERIFYING ACCOUNT ROLE PRIVILEGES...";
+  terminal.classList.add('visible');
+
+  setTimeout(() => {
+    // ENFORCE ROW-LEVEL SECURITY ACCESS VIOLATION BLOCKS
+    if (activeSimRole === 'STORE_MANAGER' && activeSimLocation === 'ALL') {
+      terminal.textContent = "❌ SECURITY ACCESS VIOLATION:\nUser role [STORE_MANAGER] is strictly blocked from querying multi-location consolidated views. Connection Terminated.";
+      return;
+    }
+    if (activeSimRole === 'STORE_MANAGER' && activeSimLocation === 'NASHIK') {
+      terminal.textContent = "❌ ACCESS BOUNDARY SCOPE EXCURSION:\nStore user authorization tokens are locked exclusively to Panvel Hub. Request to access Nashik Facility registers blocked at query level.";
+      return;
+    }
+    if (activeSimRole === 'STORE_MANAGER' && activeSimJob === 'MASS_DATA') {
+      terminal.textContent = "❌ PRIVILEGE LEVEL FAILURE:\nStore-level operators lack global credential clearance to run bulk ingestion endpoints. Action Aborted.";
+      return;
+    }
+
+    // DISPATCH VALID INGESTION PIPELINES
+    if (activeSimJob === 'MASS_DATA') {
+      terminal.textContent = `🚀 HIGH-THROUGHPUT BULK INGESTION PIPELINE SUCCESS:\nAuthenticated Identity Token: [${activeSimRole}]\nTarget Destination Scope: [${activeSimLocation}]\nAsynchronously split and ingested 3,400 incoming item records into database.\nRecalculated logistics overhead fields and financial ledgers cleanly.`;
+    } else if (activeSimJob === 'HITL_OVERRIDE') {
+      terminal.textContent = `⚠️ HUMAN-IN-THE-LOOP OVERRIDE LEDGER REVALUATION:\nManual Inspection Signed Off by Account: [${activeSimRole}] at Node: [${activeSimLocation}]\nProduce Shipment Lot #FB-8820 adjusted from Grade-A to Grade-B based on visual checks.\nLedger Updated: Adjusted farmer payout lines and re-computed markdown promo bounds.`;
+    } else if (activeSimJob === 'DECAY_RUN') {
+      terminal.textContent = `⏰ RELATIONAL PRODUCE FRESHNESS MATRIX AUDIT RUNNING:\nScanning Inventory Data Registers for Location Scope: [${activeSimLocation}]\nBatch SKU-Capsicum-04 remaining shelf life drops below 40% viability curve.\nAction Triggered: Applied automatic 20% markdown adjustment across marketplace consumer channels to minimize loss.`;
+    }
+  }, 900);
+}
+</script>
+
+</body>
+</html>
